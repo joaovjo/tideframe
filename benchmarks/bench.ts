@@ -1,7 +1,7 @@
 /**
  * Benchmarks seguindo https://bun.com/docs/project/benchmarking:
- * - microbenchmarks: medidos com `performance.now()` (equivalente do `mitata`: medida manual);
- * - carga HTTP: `fetch` com semáforos (equivalente do `oha`/`bombardier`: referência manual);
+ * - microbenchmarks: medidos com `mitata`, dependência de desenvolvimento;
+ * - carga HTTP: `fetch` com semáforos no processo embutido;
  * - cold start: `performance.now()` em torno do `import()` do app.
  *
  * Execução: `bun run benchmarks/bench.ts` — reporta avg, p50, p99, p99.9, max e RSS.
@@ -11,6 +11,7 @@ import type { App } from "tideframe/http";
 import { createApp } from "tideframe/http";
 import { createContainer, Token } from "tideframe/di";
 import { object, parse, string } from "tideframe/validate";
+import { bench, run } from "mitata";
 
 const app: App = createApp();
 app.get("/", (ctx) => ctx.json({ hello: "world" }));
@@ -94,21 +95,7 @@ async function loadTest(
 }
 
 function microBench(name: string, runs: number, fn: () => void): void {
-  const warmups = Math.max(10, Math.floor(runs / 10));
-  for (let i = 0; i < warmups; i++) fn();
-  const samples: number[] = [];
-  for (let i = 0; i < runs; i++) {
-    const start = performance.now();
-    fn();
-    samples.push(performance.now() - start);
-  }
-  const sorted = [...samples].sort((a, b) => a - b);
-  const avg = samples.reduce((sum, sample) => sum + sample, 0) / samples.length;
-  const max = sorted[sorted.length - 1] ?? 0;
-  console.log(
-    `micro ${name}: avg=${avg.toFixed(4)} ms, p50=${percentile(sorted, 50).toFixed(4)} ms, ` +
-      `p99=${percentile(sorted, 99).toFixed(4)} ms, max=${max.toFixed(4)} ms`,
-  );
+  bench(name, fn);
 }
 
 async function main(): Promise<void> {
@@ -122,6 +109,7 @@ async function main(): Promise<void> {
   microBench("validate.parse(object)", 100_000, () => {
     parse(UserSchema, { name: "Ada" });
   });
+  await run({ colors: false });
 
   console.log("== load (GET /) — 10k requests, 100 concurrent ==");
   const get = await loadTest("GET", "/", 10_000, 100);

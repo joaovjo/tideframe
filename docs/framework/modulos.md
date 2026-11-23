@@ -56,5 +56,5 @@ Verificadas na implementação:
 * **Auth**: cookies (HttpOnly, SameSite=Lax); JWT HMAC via `crypto.subtle` (Web Crypto, sem `Buffer`).
 * **DI**: sem decorators — `static inject: readonly Token[]` no construtor.
 * **wstests**: `app.ws()` — rooms/pub-sub via `ws.subscribe()`/`ws.publish()` (ServerWebSocket do Bun); backpressure via `ws.getBufferedAmount()`.
-* **Bench**: microbenchmarks medidos com `performance.now()` e carga HTTP via `fetch` com semáforos. A especificação agora permite as ferramentas de benchmarking recomendadas pelo Bun (mitata, bombardier, oha, hyperfine) como dev deps; a implementação atual usa equivalentes manuais e pode adotá-las sem violar a política de zero dependências de runtime.
+* **Bench**: microbenchmarks medidos com `mitata`, dependência permitida em `devDependencies`. Carga HTTP usa o servidor Bun com `fetch` e semáforos no benchmark embutido; `bombardier` ou `oha` podem medir carga externa e `hyperfine` mede CLI. Essas ferramentas não são dependências de runtime e não entram no pacote publicado.
 * **Recursos da especificação ainda não entregues (escopo):** restarts automáticos/HMR (`bun --hot` recomendado), workers de queue com filas Redis/Kafka (versão em memória entregue), rate-limit de auth com fila filtrada por IP (chave padrão `() => "all"`).

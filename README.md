@@ -46,17 +46,17 @@ Histórico: [docs/log.md](docs/log.md).
 
 ## Benchmarks (`bun run bench`)
 
-Medidos conforme [Bun Benchmarking](https://bun.com/docs/project/benchmarking) — `performance.now()` para microbenchmarks e `fetch` com semáforos para carga HTTP (equivalentes do `mitata`/`oha`, não instalados conforme "dev deps only Bun + TypeScript").
+Medidos conforme [Bun Benchmarking](https://bun.com/docs/project/benchmarking). Dependências de desenvolvimento são permitidas: microbenchmarks usam `mitata`; carga HTTP usa `fetch` com semáforos localmente, podendo ser substituída por `bombardier` ou `oha` em cargas externas. `hyperfine` cobre medições de CLI. Nenhuma dependência de benchmark entra no pacote publicado.
 
 | Métrica | Resultado |
 |---|---|
-| `GET /` (JSON, fetch local) | **1280 req/s** — avg 0.781 ms, p99 274.151 ms, max 349.999 ms — rss 54.9 MB |
-| `POST /users` (validado, fetch local) | **1903 req/s** — avg 0.526 ms, p99 182.942 ms, max 252.589 ms — rss 56.8 MB |
-| `di.get(singleton)` (micro) | avg 0.0001 ms |
-| `validate.parse(object)` (micro) | avg 0.0009 ms |
-| Cold start (import do app) | ~38 ms |
+| `GET /` (JSON, fetch local) | **2858 req/s** — avg 0.350 ms, p99 115.644 ms, max 181.201 ms — rss 70.1 MB |
+| `POST /users` (validado, fetch local) | **2177 req/s** — avg 0.459 ms, p99 125.429 ms, max 152.187 ms — rss 54.9 MB |
+| `di.get(singleton)` (`mitata`) | avg 16.11 ns/iter |
+| `validate.parse(object)` (`mitata`) | avg 2.33 µs/iter |
+| Cold start (import do app) | ~65.75 ms |
 
-10.000 requisições, 100 conexões concorrentes. Comparação externa nesta máquina com `autocannon` por 10 segundos e 100 conexões: Hono **3590 req/s** GET / **3617 req/s** POST; Tideframe **3553 req/s** GET / **3445 req/s** POST; Elysia **2174 req/s** GET / **2141 req/s** POST. Amostra local: Ryzen 5 3400G, 16 GB DDR4, Windows 11.
+10.000 requisições, 100 conexões concorrentes. Comparação externa nesta máquina via carga separada: Hono **3590 req/s** GET / **3617 req/s** POST; Tideframe **3553 req/s** GET / **3445 req/s** POST; Elysia **2174 req/s** GET / **2141 req/s** POST. Amostra local: Ryzen 5 3400G, 16 GB DDR4, Windows 11.
 
 GitHub Actions (Ubuntu, execução reproduzível): **23185 req/s** GET / **24044 req/s** POST, cold start **10.47 ms**. Artefato de benchmark registrado pelo workflow `Benchmark`.
 

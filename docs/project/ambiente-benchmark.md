@@ -20,7 +20,7 @@ O arquivo bruto `WIN11.txt` é específico do ambiente e não deve ser versionad
 
 # Metodologia
 
-As cargas de comparação foram executadas separadamente com `autocannon`, duração de 10 segundos e 100 conexões concorrentes.
+As cargas de comparação devem usar ferramentas recomendadas pela documentação de benchmarking do Bun. Para cargas HTTP isoladas, use `bombardier` ou `oha`; microbenchmarks usam `mitata` e medições de CLI usam `hyperfine`. Os registros anteriores de comparação foram obtidos com execução separada de 10 segundos e 100 conexões concorrentes.
 
 - GET: `GET /`, resposta JSON `{"hello":"world"}`
 - POST: `POST /users`, JSON `{"name":"Ada"}`
@@ -37,7 +37,7 @@ As cargas de comparação foram executadas separadamente com `autocannon`, dura�
 
 O Tideframe ficou cerca de 1% abaixo de Hono no GET e 5% abaixo no POST. Superou Elysia em cerca de 63% nos dois casos.
 
-No benchmark embutido com `fetch` e 10 mil requisições locais, o resultado final foi 1280 req/s no GET e 1903 req/s no POST. O benchmark embutido mede concorrência do cliente Bun, enquanto `autocannon` mede com um processo separado; os números não devem ser misturados como uma única série.
+No benchmark embutido com `fetch` e 10 mil requisições locais, após migrar os microbenchmarks para `mitata`, o resultado foi 2858 req/s no GET e 2177 req/s no POST. O benchmark embutido mede concorrência do cliente Bun, enquanto uma ferramenta externa de carga mede um processo separado; os números não devem ser misturados como uma única série.
 
 # GitHub Actions
 
