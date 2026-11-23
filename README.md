@@ -46,15 +46,15 @@ Histórico: [docs/log.md](docs/log.md).
 
 ## Benchmarks (`bun run bench`)
 
-Medidos conforme [Bun Benchmarking](https://bun.com/docs/project/benchmarking). Dependências de desenvolvimento são permitidas: microbenchmarks usam `mitata`; carga HTTP usa `fetch` com semáforos localmente, podendo ser substituída por `bombardier` ou `oha` em cargas externas. `hyperfine` cobre medições de CLI. Nenhuma dependência de benchmark entra no pacote publicado.
+Medidos conforme [Bun Benchmarking](https://bun.com/docs/project/benchmarking). Dependências de desenvolvimento são permitidas: microbenchmarks usam `mitata`; carga HTTP usa `oha` para o benchmark externo. O `fetch` embutido permanece como diagnóstico local. Nenhuma dependência de benchmark entra no pacote publicado.
 
 | Métrica | Resultado |
 |---|---|
-| `GET /` (JSON, fetch local) | **2858 req/s** — avg 0.350 ms, p99 115.644 ms, max 181.201 ms — rss 70.1 MB |
-| `POST /users` (validado, fetch local) | **2177 req/s** — avg 0.459 ms, p99 125.429 ms, max 152.187 ms — rss 54.9 MB |
-| `di.get(singleton)` (`mitata`) | avg 16.11 ns/iter |
-| `validate.parse(object)` (`mitata`) | avg 2.33 µs/iter |
-| Cold start (import do app) | ~65.75 ms |
+| `GET /` (`oha`, 100 conexões) | **1901.60 req/s** — média 49.7 ms, p50 25.0 ms, p99 1267.9 ms |
+| `POST /users` (`oha`, 100 conexões) | **1124.73 req/s** — média 87.7 ms, p50 38.8 ms, p99 1003.0 ms |
+| `di.get(singleton)` (`mitata`) | avg 236.99 ns/iter |
+| `validate.parse(object)` (`mitata`) | avg 8.10 µs/iter |
+| Cold start (import do app) | ~112.24 ms |
 
 10.000 requisições, 100 conexões concorrentes. Comparação externa nesta máquina via carga separada: Hono **3590 req/s** GET / **3617 req/s** POST; Tideframe **3553 req/s** GET / **3445 req/s** POST; Elysia **2174 req/s** GET / **2141 req/s** POST. Amostra local: Ryzen 5 3400G, 16 GB DDR4, Windows 11.
 
@@ -67,7 +67,10 @@ bun run typecheck   # tsc --noEmit
 bun run test        # bun test packages/framework/test
 bun run example     # smoke test do app de exemplo
 bun run bench       # benchmarks
+bun run bench:oha   # carga HTTP externa com oha
 ```
+
+Instale o `oha` oficial antes da carga externa: `cargo install oha --locked`.
 
 ## Versões e doc consultada
 

@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test packages/framework/test",
     "example": "bun run examples/hello/smoke.ts",
-    "bench": "bun run benchmarks/bench.ts"
+    "bench": "bun run benchmarks/bench.ts",
+    "bench:oha": "bun run benchmarks/bench-oha.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

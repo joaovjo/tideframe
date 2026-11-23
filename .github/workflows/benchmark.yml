@@ -22,9 +22,18 @@ jobs:
         with:
           bun-version: 1.4.5
       - run: bun install --frozen-lockfile
+      - name: Install oha
+        run: |
+          curl --fail --location --output oha https://github.com/hatoo/oha/releases/latest/download/oha-linux-amd64
+          chmod +x oha
+          sudo mv oha /usr/local/bin/oha
       - name: Run benchmark
         run: bun run bench | tee benchmark.txt
+      - name: Run oha benchmark
+        run: bun run bench:oha | tee benchmark-oha.txt
       - uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: benchmark.txt
+          path: |
+            benchmark.txt
+            benchmark-oha.txt
