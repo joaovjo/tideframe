@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "mitata": "^1.0.34",
     "tideframe": "workspace:*",
     "typescript": "latest"
   }

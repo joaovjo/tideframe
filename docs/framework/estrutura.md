@@ -113,4 +113,4 @@ antes de implementação, aprovação por evidência, crítico independente).
 ## Versões e doc consultada (Bun/TS)
 
 - **Bun 1.4.5** (Windows 11, 2026-11-23). Docs consultadas: `bun.com/docs/runtime` (runtime), `bun.com/docs/runtime/sql` (Bun.SQL, 2026-11-23), `bun.com/docs/runtime/s3` via bun-mcp (Bun.s3, 2026-11-23), `bun.com/docs/test`, `bun.com/docs/project/benchmarking`.
-- **TypeScript 7.0.2** (devDep instalado em 2026-11-23; `bunx tsc --version`). Docs consultadas: devblogs Microsoft "Announcing TypeScript 7.0" (2026-07-08) e "Announcing TypeScript 7.1 Beta" (2026-10-20).
+- **TypeScript 7.0.2** (devDep instalado em 2026-11-23; `bunx tsc --version`). Docs consultadas: devblogs Microsoft "Announcing TypeScript 7.0" (2026-07-08) e "Announcing TypeScript 7.1 Beta" (2026-10-20). Dev deps permitidas pela especificação: Bun, TypeScript e ferramentas de benchmarking (mitata, bombardier, oha, hyperfine).

@@ -2,6 +2,7 @@
 
 ## 2026-11-23
 
+* **Update**: [Módulos](framework/modulos.md) e [Estrutura](framework/estrutura.md) — documentação de implementação alinhada à nova política de dev deps (Bun, TypeScript e ferramentas de benchmarking do Bun).
 * **Update**: [Prompt do Framework](project/prompt-framework.md) e `prompt.txt` — dev deps agora incluem as ferramentas de benchmarking recomendadas pelo Bun (mitata, bombardier, oha, hyperfine).
 * **Create**: `prompt.txt` (EN) na raiz com a especificação do framework.
 * **Create**: [Prompt do Framework](project/prompt-framework.md) (PT-BR, canônico).
