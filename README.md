@@ -58,7 +58,7 @@ Medidos conforme [Bun Benchmarking](https://bun.com/docs/project/benchmarking). 
 
 10.000 requisições, 100 conexões concorrentes. Comparação externa nesta máquina via carga separada: Hono **3590 req/s** GET / **3617 req/s** POST; Tideframe **3553 req/s** GET / **3445 req/s** POST; Elysia **2174 req/s** GET / **2141 req/s** POST. Amostra local: Ryzen 5 3400G, 16 GB DDR4, Windows 11.
 
-GitHub Actions (Ubuntu, execução reproduzível): **23185 req/s** GET / **24044 req/s** POST, cold start **10.47 ms**. Artefato de benchmark registrado pelo workflow `Benchmark`.
+GitHub Actions (Ubuntu, `oha` externo reproduzível): **13564.59 req/s** GET / **14176.42 req/s** POST. `mitata`: DI **12.65 ns/iter**, validação **216.01 ns/iter**. Artefato registrado pelo workflow `Benchmark`.
 
 ## Desenvolvimento
 

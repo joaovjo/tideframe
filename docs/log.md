@@ -2,7 +2,7 @@
 
 ## 2026-11-23
 
-* **Benchmark**: `oha 1.17.0` integrado ao runner local e aos workflows; desktop registrou 1901.60 req/s em GET / e 1124.73 req/s em POST /users.
+* **Benchmark**: `oha 1.17.0` integrado ao runner local e aos workflows; desktop registrou 1901.60 req/s em GET / e 1124.73 req/s em POST /users; Ubuntu registrou 13564.59 req/s e 14176.42 req/s.
 * **Update**: benchmark migrado para `mitata`; dependências de desenvolvimento são permitidas e o benchmark segue as ferramentas recomendadas pelo Bun.
 * **Update**: política de benchmark — dependências de desenvolvimento são permitidas; microbenchmarks usam `mitata` e carga HTTP/CLI segue ferramentas recomendadas pelo [Bun Benchmarking](https://bun.com/docs/project/benchmarking).
 * **Benchmark**: GitHub Actions Ubuntu registrou 23185 req/s em GET / e 24044 req/s em POST /users, com cold start de 10.47 ms.

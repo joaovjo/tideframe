@@ -41,12 +41,11 @@ Na carga real com `oha 1.17.0`, o desktop obteve 1901.60 req/s no GET e 1124.73 
 
 # GitHub Actions
 
-Uma execução reproduzível no runner Ubuntu do workflow `Benchmark` registrou:
+Uma execução reproduzível no runner Ubuntu do workflow `Benchmark`, usando `oha 1.17.0`, registrou:
 
-- GET `/`: 23185 req/s
-- POST `/users`: 24044 req/s
-- Cold start: 10.47 ms
-- RSS: 61.9 MB no GET e 62.7 MB no POST
+- GET `/`: 13564.59 req/s, média 7.28 ms, p50 7.06 ms, p99 19.25 ms
+- POST `/users`: 14176.42 req/s, média 6.97 ms, p50 6.10 ms, p99 14.72 ms
+- Microbenchmarks `mitata`: DI 12.65 ns/iter, validação 216.01 ns/iter
 
 # Otimizações aplicadas
 
