@@ -58,6 +58,8 @@ Medidos conforme [Bun Benchmarking](https://bun.com/docs/project/benchmarking) �
 
 10.000 requisições, 100 conexões concorrentes. Comparação externa nesta máquina com `autocannon` por 10 segundos e 100 conexões: Hono **3590 req/s** GET / **3617 req/s** POST; Tideframe **3553 req/s** GET / **3445 req/s** POST; Elysia **2174 req/s** GET / **2141 req/s** POST. Amostra local: Ryzen 5 3400G, 16 GB DDR4, Windows 11.
 
+GitHub Actions (Ubuntu, execução reproduzível): **23185 req/s** GET / **24044 req/s** POST, cold start **10.47 ms**. Artefato de benchmark registrado pelo workflow `Benchmark`.
+
 ## Desenvolvimento
 
 ```bash

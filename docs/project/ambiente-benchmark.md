@@ -39,6 +39,15 @@ O Tideframe ficou cerca de 1% abaixo de Hono no GET e 5% abaixo no POST. Superou
 
 No benchmark embutido com `fetch` e 10 mil requisições locais, o resultado final foi 1280 req/s no GET e 1903 req/s no POST. O benchmark embutido mede concorrência do cliente Bun, enquanto `autocannon` mede com um processo separado; os números não devem ser misturados como uma única série.
 
+# GitHub Actions
+
+Uma execução reproduzível no runner Ubuntu do workflow `Benchmark` registrou:
+
+- GET `/`: 23185 req/s
+- POST `/users`: 24044 req/s
+- Cold start: 10.47 ms
+- RSS: 61.9 MB no GET e 62.7 MB no POST
+
 # Otimizações aplicadas
 
 - Roteamento direto por chave `method pathname` para rotas estáticas.

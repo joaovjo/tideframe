@@ -2,6 +2,7 @@
 
 ## 2026-11-23
 
+* **Benchmark**: GitHub Actions Ubuntu registrou 23185 req/s em GET / e 24044 req/s em POST /users, com cold start de 10.47 ms.
 * **Create**: [Ambiente e Benchmark](project/ambiente-benchmark.md) — registro do Ryzen 5 3400G/Windows 11, metodologia e comparação local Hono/Elysia/Tideframe.
 * **Optimize**: rota estática em tabela direta, reutilização de `URL`, resposta sem clone de headers e middleware de segurança síncrono; cold start ~115 ms -> ~38 ms.
 * **Workflow**: GitHub Actions para benchmark em push, PR e execução manual.
