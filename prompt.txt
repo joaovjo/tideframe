@@ -1,0 +1,212 @@
+Build a complete backend framework in TypeScript 7.x, Bun-first, batteries-included, with zero runtime dependencies and frontend-agnostic.
+
+PRIORITIES (in this order when they conflict)
+
+1. Simplicity and correctness
+2. Friendly, predictable developer experience
+3. Maintainability and minimal surface
+4. Performance within the target
+
+CONSTRAINTS
+
+- TypeScript 7.x strict; follow https://ts.dev/style/ and https://google.github.io/styleguide/tsguide.html. Consult https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/ and https://devblogs.microsoft.com/typescript/announcing-typescript-7-1-beta/ for the target version. Enable `erasableSyntaxOnly`, `verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`.
+- Bun is the runtime. Use Bun APIs first. The official Bun documentation is the source of truth: https://bun.com/docs, https://bun.com/llms.txt, https://bun.com/llms-full.txt, https://bun.com/docs/runtime/sql. Consult it before using or designing against any Bun API; do not rely on memory. Record the Bun version and the documentation date consulted.
+- Benchmarking follows Bun's official guidance (https://bun.com/docs/project/benchmarking): `Bun.nanoseconds()` / `performance.now()` for timing, `mitata` for microbenchmarks, `bombardier` or `oha` for HTTP load testing, `hyperfine` for CLI. Do not use autocannon or Node-based load testers that are slower than `Bun.serve`.
+- Zero runtime dependencies; dev deps: Bun, TypeScript, and the benchmarking tools recommended in Bun's docs (mitata, bombardier, oha, hyperfine). Workspace packages are internal.
+- Simplicity first. Prefer the simplest design that meets the spec. No speculative abstractions, no feature beyond the spec, no configuration for hypothetical futures. If a senior engineer would call it overcomplicated, simplify.
+- Friendly DX. Predictable names, consistent errors, helpful messages, minimal boilerplate. A new user should be productive in minutes.
+- Maintainability. Small modules, explicit dependencies, no hidden global state, no magic, no reflection. Upgrading one module must not break another. Every module must be understandable in isolation.
+- Fail loud. No empty catch, no silent fallback, no infinite retry, no default value hiding missing data. Errors must be visible and actionable.
+- Scale from microapp to enterprise. The framework is modular and incremental: a microapp uses only `core` + `http`; an enterprise app adopts every module. No mandatory project layout. The monorepo is the development structure, not the consumer's required structure.
+- BDD + TDD. Every module starts with a failing BDD spec in `bun:test` (`describe`/`it`, Given/When/Then in the test names). Red → green → refactor. No implementation without a failing test first. No Gherkin dependency.
+- No thin wrappers over Bun. Decision rule:
+  * Bun has the primitive → call it directly; framework API only if it adds typing, lifecycle, config, or composition.
+  * Bun has it partially → extend/compose, not 1:1.
+  * Bun lacks it → implement.
+- Frontend agnostic; no templating engine; no React/Vue/Svelte coupling. Serve JSON, text, HTML, streams, SSE, and files.
+- Monorepo Next.js-style: `packages/framework` holds the framework and all batteries as internal modules; auxiliary packages (`create-framework`, etc.) are separate. No separate battery packages. Batteries ship together and are adopted by import, not by install.
+- No Node.js compatibility layer.
+- Public API is framework-owned; do not re-export Bun internals. No `export * from 'bun:*'`.
+- No `any` in public types; no `@ts-ignore`; no enums, namespaces, parameter properties, or decorators.
+- Tree-shakeable; importing one module must not pull the whole framework.
+- Typed errors with HTTP status.
+- Validation implements Standard Schema v1 (https://standardschema.dev/). Schemas expose `~standard.validate`; no zod.
+- Databases: PostgreSQL, MySQL, MariaDB, and SQLite via `Bun.SQL` (`sql`, `SQL` from `bun`), per https://bun.com/docs/runtime/sql#database-support. `bun:sqlite` is available for direct SQLite access. No third-party drivers.
+
+TARGET
+
+- Bun 1.3+ (latest stable at build time), TypeScript 7.x (7.1 beta notes consulted), Windows 11 / Linux / macOS.
+- 50k req/s on a JSON route, 100 concurrent connections, ~1 KB response, on Ryzen 7 7700X / Apple M3 Pro.
+- p99 < 5 ms at 10k req/s.
+- Cold start < 100 ms.
+- RSS < 50 MB hello world; < 100 MB with ORM.
+- Typecheck < 5 s warm; tests < 30 s.
+- Public API: no subpath > 100 exports; no internal type leaks.
+- No console errors/warnings on startup.
+
+ARCHITECTURE
+
+- Internal modules: `core`, `http`, `di`, `config`, `log`, `errors`, `validate`, `orm`, `auth`, `cache`, `queue`, `ws`, `events`, `storage`, `mailer`, `cli`, `test`.
+- Dependency direction: `core` ← `errors`/`log`/`config`/`di`/`validate` ← `http` ← `orm`/`auth`/`cache`/`queue`/`ws`/`events`/`storage`/`mailer` ← `cli`.
+- No circular dependencies; internal imports via `#`; public imports via subpath exports.
+- `packages/framework` has one `package.json` with `exports` and `imports` (`#*`); each module has `src/<module>/` and `test/<module>/`. Auxiliary packages live in `packages/*`.
+- All batteries ship in the same `packages/framework`. A microapp imports only `core` + `http`; an enterprise app imports all. No separate installation; no mandatory layout.
+- Development structure:
+
+```text
+package.json          # workspaces: ["packages/*"], private
+tsconfig.json
+tsconfig.base.json
+packages/
+  framework/
+    package.json      # name: "<framework>", exports, imports (#*)
+    src/
+      core/ http/ di/ config/ log/ errors/ validate/ orm/ auth/
+      cache/ queue/ ws/ events/ storage/ mailer/ cli/ test/
+    test/
+  create-framework/   # scaffold CLI
+examples/
+benchmarks/
+integration/
+docs/
+```
+
+FEATURES
+
+| Area | What goes in |
+|---|---|
+| HTTP | Bun.serve, router, middleware, request/response, SSE, static files, security headers, CORS |
+| DI | tokens, constructor injection, scopes (singleton/transient/request) |
+| Config | typed, env, .env, validation, secrets, per-environment |
+| Log | structured, levels, sinks, request context, redaction |
+| Errors | typed hierarchy, status mapping, problem+json, error handler |
+| Validation | Standard Schema v1; schema, coercion, nested, custom rules, typed output; no zod |
+| ORM | PostgreSQL, MySQL, MariaDB, SQLite via `Bun.SQL`; query builder, relations, hooks, timestamps, soft deletes, transactions, migrations, seeders/factories |
+| Auth | session, opaque token, JWT HMAC, Bun.password, guards, roles/permissions, CSRF, rate limit |
+| Cache | memory + Redis adapter if Bun exposes; TTL, tags, stampede |
+| Queue | memory + Redis adapter if available; workers, retries, backoff, DLQ, cron |
+| WebSockets | rooms, pub/sub, auth, typed messages, backpressure |
+| Events | in-process, typed, wildcards, error isolation |
+| Storage | local (Bun.file/Bun.write) + S3 (Bun.s3) + adapter interface |
+| Mailer | interface + log/memory transport + minimal SMTP client (EHLO, STARTTLS, AUTH, MAIL FROM, RCPT TO, DATA); not an MTA |
+| CLI | create, dev, build, migrate, db:seed, routes, test, doctor |
+| Test | BDD + TDD with bun:test; specs before code; app factory, inject, fake time/queue/mail, type tests |
+| Diagnostics | `doctor` command: empty catch, silent fallback, infinite retry, default hiding missing data; lists before fixing |
+
+API SURFACE
+
+Hello world:
+
+```ts
+import { createApp } from '<framework>/http';
+
+const app = createApp();
+app.get('/', (ctx) => ctx.json({ hello: 'world' }));
+app.listen({ port: 3000 });
+```
+
+Middleware + validation + DI:
+
+```ts
+import { createApp } from '<framework>/http';
+import { createContainer } from '<framework>/di';
+import { z } from '<framework>/validate';
+
+const container = createContainer();
+container.set(Logger, new ConsoleLogger());
+
+const app = createApp({ container });
+app.use(async (ctx, next) => { await next(); });
+app.post('/users', async (ctx) => {
+  const body = z.object({ name: z.string() }).parse(await ctx.json());
+  return ctx.json({ id: crypto.randomUUID(), name: body.name });
+});
+```
+
+ORM + migrations:
+
+```ts
+import { defineModel, migrate } from '<framework>/orm';
+import { Database } from 'bun:sqlite';
+
+const db = new Database('app.db');
+const User = defineModel('users', {
+  id: { type: 'integer', primary: true },
+  name: { type: 'string' },
+  email: { type: 'string', unique: true },
+  createdAt: { type: 'datetime', default: () => new Date() },
+});
+await migrate(db, [User]);
+const user = await User.query().where('email', 'a@b.com').first();
+```
+
+Auth:
+
+```ts
+import { auth } from '<framework>/auth';
+app.use(auth({ session: { secret: config.auth.secret } }));
+app.get('/me', (ctx) => ctx.json(ctx.user));
+```
+
+WebSockets:
+
+```ts
+app.ws('/chat', {
+  open(ws) { ws.subscribe('chat'); },
+  message(ws, msg) { ws.publish('chat', msg); },
+});
+```
+
+Naming:
+
+- `createApp`, `defineConfig`, `defineModel`, `migrate`, `inject`, `ctx.json/text/html/redirect/stream/file`.
+- Errors end with `Error`; guards end with `Guard`; adapters end with `Adapter`.
+
+DIAGNOSTICS
+
+The framework ships a `doctor` command that finds every place in the app where an error happens and nobody finds out: empty `catch` blocks, silent fallbacks, infinite retries, and default values hiding missing data. It lists every occurrence before changing anything.
+
+```bash
+bunx <framework> doctor
+```
+
+Literal instruction: "Find every place in my app where an error happens and nobody finds out: empty try/catch, silent fallback, infinite retry, default value hiding missing data. Show me the list before changing anything."
+
+REFERENCES
+
+- Bun docs: https://bun.com/docs, https://bun.com/llms.txt, https://bun.com/llms-full.txt, https://bun.com/docs/runtime/sql, https://bun.com/docs/runtime/sql#database-support, https://bun.com/docs/project/benchmarking.
+- TypeScript: https://ts.dev/style/, https://google.github.io/styleguide/tsguide.html, https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/, https://devblogs.microsoft.com/typescript/announcing-typescript-7-1-beta/.
+- Standard Schema: https://standardschema.dev/.
+- `exemplos/`: 16 reference repos. Consult for API patterns; do not copy code; record findings in `docs/referencias/`.
+- `docs/`: the project knowledge base; update it with every decision and learning.
+
+VERIFICATION
+
+- BDD specs for every feature, written before the implementation; `bun test` passes (unit + integration), coverage >= 90% core.
+- TDD: red → green → refactor; no module implemented without a failing spec first.
+- `bun run typecheck` (`tsc --noEmit`) clean.
+- `bun run example` (app starts; smoke test hits every route).
+- `bun run bench` follows https://bun.com/docs/project/benchmarking: mitata for microbenchmarks, bombardier/oha for HTTP load, `Bun.nanoseconds()` for cold start; report avg, p99, max, RSS.
+- Independent critic: sees spec, README, examples, public types, app responses; never internal source or reasoning. Returns prioritized defects; iterate until nothing above "minor".
+- No console errors/warnings; no `any` in public types; no `@ts-ignore`.
+- Bun docs and TS guides consulted; version/date recorded in `README.md`.
+- `bunx <framework> doctor` lists zero unlisted silent failures; every finding is resolved or explicitly accepted.
+
+DONE WHEN
+
+- All gates pass.
+- Deliverables: monorepo with `packages/framework`, types, tests, example app, README, perf report, critic review.
+- Example app demonstrates every battery.
+- `docs/` updated with the prompt, references, and decisions.
+- `doctor` reports no hidden errors.
+
+NON-GOALS
+
+- Frontend rendering / templating engine.
+- Node.js compatibility.
+- Plugin ecosystem.
+- Deployment tooling.
+- Full SMTP MTA (the framework ships a minimal SMTP client, not a mail server).
+- Third-party database drivers; only the adapters Bun.SQL provides (PostgreSQL, MySQL, MariaDB, SQLite).
+- Rigid project layout; the framework does not impose one.
+- Backward compatibility before 1.0.

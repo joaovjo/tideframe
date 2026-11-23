@@ -1,0 +1,18 @@
+{
+  "name": "tideframe-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test packages/framework/test",
+    "example": "bun run examples/hello/smoke.ts",
+    "bench": "bun run benchmarks/bench.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "tideframe": "workspace:*",
+    "typescript": "latest"
+  }
+}
