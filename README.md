@@ -50,13 +50,13 @@ Medidos conforme [Bun Benchmarking](https://bun.com/docs/project/benchmarking) �
 
 | Métrica | Resultado |
 |---|---|
-| `GET /` (JSON) | **3284 req/s** — avg 0.304 ms, p99 86.0 ms, max 111.2 ms — rss 47.4 MB |
-| `POST /users` (validado) | **3188 req/s** — avg 0.314 ms, p99 159.2 ms, max 239.4 ms — rss 46.9 MB |
+| `GET /` (JSON, fetch local) | **1280 req/s** — avg 0.781 ms, p99 274.151 ms, max 349.999 ms — rss 54.9 MB |
+| `POST /users` (validado, fetch local) | **1903 req/s** — avg 0.526 ms, p99 182.942 ms, max 252.589 ms — rss 56.8 MB |
 | `di.get(singleton)` (micro) | avg 0.0001 ms |
-| `validate.parse(object)` (micro) | avg 0.0003 ms |
-| Cold start (import do app) | ~29 ms |
+| `validate.parse(object)` (micro) | avg 0.0009 ms |
+| Cold start (import do app) | ~38 ms |
 
-10.000 requisições, 100 conexões concorrentes. Nota: o alvo do spec era 50k req/s em Ryzen 7 7700X / Apple M3 Pro; nesta máquina (Windows, similar) medido até ~3.2k req/s — gap conhecido, candidato: caminho do router + `Response` por rota (HTTP nativo `Bun.serve` direto) — nota registrada, otimização futura.
+10.000 requisições, 100 conexões concorrentes. Comparação externa nesta máquina com `autocannon` por 10 segundos e 100 conexões: Hono **3590 req/s** GET / **3617 req/s** POST; Tideframe **3553 req/s** GET / **3445 req/s** POST; Elysia **2174 req/s** GET / **2141 req/s** POST. Amostra local: Ryzen 5 3400G, 16 GB DDR4, Windows 11.
 
 ## Desenvolvimento
 

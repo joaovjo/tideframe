@@ -5,6 +5,6 @@ Banco de conhecimentos central do projeto. Todo conhecimento novo entra aqui; to
 ## Seções
 
 * [Prompt Engineering](prompt-engineering/index.md) — Princípios, estudo de caso e fragilidades de especificações dirigidas a agentes de IA.
-* [Projeto](project/index.md) — Direção, prioridades e gestão do conhecimento.
+* [Projeto](project/index.md) — Direção, prioridades, ambiente e gestão do conhecimento.
 * [Framework](framework/index.md) — Monorepo, módulos e benchmark do framework.
 * [Referências](referencias/index.md) — Análise dos repositórios em `exemplos/`.

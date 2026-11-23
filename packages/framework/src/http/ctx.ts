@@ -12,7 +12,7 @@ import { sseResponse } from "./sse";
 export type Handler = (ctx: Ctx) => Response | Promise<Response> | void | Promise<void>;
 
 /** Middleware: executa algo, chama `next()` e retorna a resposta. */
-export type Middleware = (ctx: Ctx, next: () => Promise<Response>) => Promise<Response>;
+export type Middleware = (ctx: Ctx, next: () => Promise<Response>) => Response | Promise<Response>;
 
 /** Contexto de request. */
 export interface Ctx {
@@ -64,21 +64,22 @@ function mergeHeaders(base: Headers, init?: ResponseInit): Headers {
 }
 
 function respond(ctx: Ctx, body: BodyInit | null, init?: ResponseInit): Response {
+  if (init === undefined) return new Response(body, { headers: ctx.headers });
   const headers = mergeHeaders(ctx.headers, init);
   return new Response(body, init === undefined ? { headers } : { ...init, headers });
 }
 
 /** Cria um `Ctx` para uma request HTTP. */
-export function createCtx(req: Request, params: Record<string, string>): Ctx {
-  const url = new URL(req.url);
+export function createCtx(req: Request, params: Record<string, string>, url?: URL): Ctx {
+  const requestUrl = url ?? new URL(req.url);
   const headers = new Headers();
   const locals: Record<string, unknown> = {};
   const ctx: Ctx = {
     req,
     method: req.method.toUpperCase(),
-    pathname: url.pathname,
+    pathname: requestUrl.pathname,
     params,
-    query: url.searchParams,
+    query: requestUrl.searchParams,
     headers,
     locals,
 

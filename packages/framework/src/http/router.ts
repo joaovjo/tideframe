@@ -56,9 +56,14 @@ export function matchPath(pattern: string, pathname: string): Record<string, str
 /** Tabela de rotas — `add` + `find` + `info`. */
 export class Router {
   private readonly routes: Route[] = [];
+  private readonly exactRoutes = new Map<string, Route>();
 
   add(method: string, pattern: string, handler: Handler): void {
-    this.routes.push({ method, pattern, handler });
+    const route = { method, pattern, handler };
+    this.routes.push(route);
+    if (!pattern.includes(":") && !pattern.includes("*")) {
+      this.exactRoutes.set(`${method} ${pattern}`, route);
+    }
   }
 
   info(): readonly RouteInfo[] {
@@ -66,6 +71,9 @@ export class Router {
   }
 
   find(method: string, pathname: string): Match {
+    const exact = this.exactRoutes.get(`${method} ${pathname}`);
+    if (exact !== undefined) return { route: exact, params: {}, methods: [exact.method] };
+
     const methods: string[] = [];
     for (const route of this.routes) {
       const params = matchPath(route.pattern, pathname);

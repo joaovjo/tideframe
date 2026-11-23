@@ -153,12 +153,13 @@ class AppImpl implements App {
   async handle(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const match = this.router.find(request.method.toUpperCase(), url.pathname);
-    const ctx = createCtx(request, match.params);
+    const ctx = createCtx(request, match.params, url);
     const middlewares = [...this.coreMiddlewares, ...this.userMiddlewares];
     const runAt = (index: number): Promise<Response> => {
       const middleware = middlewares[index];
       if (middleware === undefined) return this.invokeRoute(match, ctx);
-      return middleware(ctx, () => runAt(index + 1));
+      const result = middleware(ctx, () => runAt(index + 1));
+      return result instanceof Promise ? result : Promise.resolve(result);
     };
     try {
       return await runAt(0);
